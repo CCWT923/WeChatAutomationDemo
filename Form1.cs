@@ -77,6 +77,21 @@ namespace WeChatAutomationDemo
             }, TimeSpan.FromSeconds(5), null, true, false, "没有找到「通知溢出」的按钮。");
             //查找并点击托盘区域微信的图标
             btn_WeChat_TrayButton = Panel_NotifyOverFlowArea.FindFirstDescendant(cf.ByName("微信")).AsButton();
+            //如果微信有新消息，直接点击按钮不会调出主窗口，需要点击“忽略全部”
+            var rect = btn_WeChat_TrayButton.BoundingRectangle;
+            WriteLog(rect.Width + "," + rect.Height + "," + rect.X + "," + rect.Y);
+            Mouse.MoveTo(rect.X, rect.Y); //移动到微信按钮上
+            //查找是否有“忽略全部”的按钮
+            var ignoreButton = desktop.FindFirstDescendant(cf.ByName("微信")).AsWindow().FindFirstDescendant(cf.ByName("忽略全部")).AsButton();
+            ignoreButton.DrawHighlight();
+            if(ignoreButton != null)
+            {
+                WriteLog("忽略新消息");
+                rect = ignoreButton.BoundingRectangle;
+                //这里不能直接点击按钮
+                Mouse.MoveTo(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
+            }
+            Thread.Sleep(3000);
             btn_WeChat_TrayButton.Click();
             Thread.Sleep(300);
             btn_NotifyMore.Click();

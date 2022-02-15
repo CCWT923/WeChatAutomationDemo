@@ -318,6 +318,7 @@ namespace WeChatAutomationDemo
                 return;
             }
             SendMessage(wechatMainWindow, chatBox, TextBox_Message.Text);
+            wechatMainWindow.Close();
         }
 
         private void Button_SendMessage_Click(object sender, EventArgs e)

@@ -30,6 +30,7 @@ namespace WeChatAutomationDemo
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.TextBox_Log = new System.Windows.Forms.TextBox();
             this.TextBox_AppPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -43,6 +44,7 @@ namespace WeChatAutomationDemo
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.CheckBox_ScheduleTask = new System.Windows.Forms.CheckBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -97,7 +99,7 @@ namespace WeChatAutomationDemo
             this.TextBox_Message.Name = "TextBox_Message";
             this.TextBox_Message.Size = new System.Drawing.Size(384, 98);
             this.TextBox_Message.TabIndex = 6;
-            this.TextBox_Message.Text = "测试内容";
+            this.TextBox_Message.Text = "{TIME}  测试内容";
             // 
             // Button_SendMessage
             // 
@@ -164,8 +166,15 @@ namespace WeChatAutomationDemo
             // 
             // timer1
             // 
-            this.timer1.Interval = 3000;
+            this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "notifyIcon1";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
             // Form1
             // 
@@ -181,6 +190,7 @@ namespace WeChatAutomationDemo
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -202,6 +212,7 @@ namespace WeChatAutomationDemo
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.CheckBox CheckBox_ScheduleTask;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }
 

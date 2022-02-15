@@ -48,10 +48,21 @@ namespace WeChatAutomationDemo
             }
             return null;
         }
+        /**
+         * TODO 
+         *     自动登录微信
+         *     定时发送时可选发送次数或发送内容
+         * 
+         */
+        private void LoginWeChat()
+        {
+
+        }
 
         private void ShowNotifyOverflow(AutomationElement desktop, ConditionFactory cf)
         {
             var notifyOverflowButton = desktop.FindFirstDescendant(cf.ByAutomationId("1502")).AsButton();
+            
             if(notifyOverflowButton == null)
             {
                 notifyOverflowButton = desktop.FindFirstDescendant(cf.ByName("通知 V 形")).AsButton();
@@ -185,6 +196,7 @@ namespace WeChatAutomationDemo
             }
             rect = btn_SendMessage.BoundingRectangle;
             //这里如果是中文输入法的话，输入英文可能出现问题，这里暂时使用粘贴方式解决
+            message = message.Replace("{TIME}", $"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}");
             Clipboard.SetText(message);
             Keyboard.Pressing(VirtualKeyShort.CONTROL);
             Keyboard.Press(VirtualKeyShort.KEY_V);
@@ -314,9 +326,9 @@ namespace WeChatAutomationDemo
             {
                 timer1.Enabled = false;
                 WriteLog("停止计划任务。");
-                Button_SendMessage.Text = "发送";
+                Button_SendMessage.Text = "发送消息";
             }
-            if (CheckBox_ScheduleTask.Checked)
+            else if (CheckBox_ScheduleTask.Checked)
             {
                 timer1.Enabled = true;
                 WriteLog("开始执行定时任务。");
@@ -337,6 +349,29 @@ namespace WeChatAutomationDemo
             {
                 WriteLog($"到达指定时间：{dateTimePicker1.Value}，开始执行定时任务。");
                 StartProgress();
+            }
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.SetVisibleCore(true);
+                this.WindowState = FormWindowState.Normal;
+                this.ShowInTaskbar = true;
+                this.notifyIcon1.Visible = false;
+                this.Activate();
+            }
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                notifyIcon1.Visible = true;
+                //不在任务管理器的“应用程序”选项卡中显示
+                SetVisibleCore(false);
             }
         }
     }

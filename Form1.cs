@@ -178,9 +178,7 @@ namespace WeChatAutomationDemo
             WriteLog("搜索发送对象：" + target);
             rect = edit_SearchChatObject.BoundingRectangle;
             ClickRectangleEnter(rect);
-            edit_SearchChatObject.AsTextBox().Enter(target);
-            //Thread.Sleep(1000);
-            Keyboard.Press(VirtualKeyShort.ENTER);
+            PasteContent(target);
 
             //搜索结果是包含在一个 List 控件中的
             var searchResult = wechatWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.List).And(cf.ByName("搜索结果")));
@@ -218,6 +216,10 @@ namespace WeChatAutomationDemo
             return edit_MessageInput;
         }
 
+        /// <summary>
+        /// 点击指定矩形的中间位置
+        /// </summary>
+        /// <param name="rect"></param>
         private void ClickRectangleEnter(in Rectangle rect)
         {
             Mouse.Click(new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2));
@@ -228,10 +230,17 @@ namespace WeChatAutomationDemo
             //var rect = chatInputBux.BoundingRectangle;
             //Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
             //Thread.Sleep(500);
-            //点击「聊天」按钮
+            //消息内容输入的文本快
             var rect = chatInputBox.BoundingRectangle;
             ClickRectangleEnter(rect);
+            message = message.Replace("{TIME}", $"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}");
 
+            //输入消息。这里如果是中文输入法的话，输入英文可能出现问题，这里暂时使用粘贴方式解决
+            //chatInputBox.AsTextBox().Enter(message);
+            PasteContent(message);
+            //不支持
+            //chatInputBox.AsTextBox().Patterns.LegacyIAccessible.Pattern.SetValue(message);
+            //MessageBox.Show(chatInputBox.AsTextBox().Patterns.LegacyIAccessible.Pattern.Value);
             //查找「发送」按钮，并单击发送消息
             var btn_SendMessage = GetWeChatControl(wechatWindow,"发送(S)", ControlType.Button);
             if (btn_SendMessage == null)
@@ -243,15 +252,21 @@ namespace WeChatAutomationDemo
                 WriteLog("没有找到「发送消息」的按钮。");
                 return;
             }
+
             rect = btn_SendMessage.BoundingRectangle;
-            //这里如果是中文输入法的话，输入英文可能出现问题，这里暂时使用粘贴方式解决
-            message = message.Replace("{TIME}", $"{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}");
-            Clipboard.SetText(message);
+            ClickRectangleEnter(rect);
+            WriteLog($"消息 「{message}」 发送成功。");
+        }
+
+        /// <summary>
+        /// 从剪贴板粘贴内容
+        /// </summary>
+        private void PasteContent(string content)
+        {
+            Clipboard.SetText(content);
             Keyboard.Pressing(VirtualKeyShort.CONTROL);
             Keyboard.Press(VirtualKeyShort.KEY_V);
             Keyboard.Release(VirtualKeyShort.CONTROL);
-            ClickRectangleEnter(rect);
-            WriteLog($"消息 「{message}」 发送成功。");
         }
 
         private int GetProcessId(string processName)
@@ -367,7 +382,7 @@ namespace WeChatAutomationDemo
                 return;
             }
             SendMessage(wechatMainWindow, chatBox, TextBox_Message.Text);
-            wechatMainWindow.Close();
+            //wechatMainWindow.Close();
         }
 
         private void Button_SendMessage_Click(object sender, EventArgs e)

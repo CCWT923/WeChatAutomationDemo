@@ -12,6 +12,7 @@ using Application = FlaUI.Core.Application;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.WindowsAPI;
 using System.IO;
+using System.Collections.Generic;
 
 namespace WeChatAutomationDemo
 {
@@ -155,7 +156,7 @@ namespace WeChatAutomationDemo
         /// <param name="wechatWindow"></param>
         /// <param name="target"></param>
         /// <returns>返回指定搜索对象的聊天输入框</returns>
-        private AutomationElement SearchTarget(in Window wechatWindow, string target)
+        private AutomationElement SearchTarget(Window wechatWindow, string target)
         {
             //获取并单击「聊天」按钮，如果直接将其 AsButton() 单击的话，会出现找不到点击位置的异常
             //所以这里获取按钮的矩形，然后点击其中间
@@ -169,21 +170,32 @@ namespace WeChatAutomationDemo
             ClickRectangleEnter(rect);
             //Thread.Sleep(500);
 
-            var edit_SearchChatObject = GetWeChatControl(in wechatWindow,"搜索", ControlType.Edit);
+            var edit_SearchChatObject = GetWeChatControl(wechatWindow,"搜索", ControlType.Edit);
             if (edit_SearchChatObject == null)
             {
                 WriteLog("没有找到指定的控件：搜索框。");
                 return null;
             }
-            WriteLog("搜索发送对象：" + target);
+            
             rect = edit_SearchChatObject.BoundingRectangle;
             ClickRectangleEnter(rect);
             PasteContent(target);
-
-            //搜索结果是包含在一个 List 控件中的
-            var searchResult = wechatWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.List).And(cf.ByName("搜索结果")));
-            AutomationElement conditionControl;
+            WriteLog("搜索发送对象：" + target);
             Thread.Sleep(500);
+            //搜索结果是包含在一个 List 控件中的
+            AutomationElement searchResult = null;
+            Retry.WhileNull(() =>
+            {
+                searchResult = wechatWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.List).And(cf.ByName("搜索结果")));
+                return searchResult;
+            },TimeSpan.FromSeconds(10),TimeSpan.FromMilliseconds(100),false,false,"没有找到「搜索结果」的列表。");
+            
+            if(searchResult == null)
+            {
+                return null;
+            }
+
+            AutomationElement conditionControl;
             if(searchResult != null)
             {
                 //查找 List 控件是否有「联系人」的 「Text」控件
@@ -191,6 +203,7 @@ namespace WeChatAutomationDemo
             }
             else
             {
+                WriteLog($"{nameof(searchResult)} is null.");
                 return null;
             }
             
@@ -255,7 +268,34 @@ namespace WeChatAutomationDemo
 
             rect = btn_SendMessage.BoundingRectangle;
             ClickRectangleEnter(rect);
-            WriteLog($"消息 「{message}」 发送成功。");
+            var messageList = GetMessageList(wechatWindow);
+            //判断最后一条消息是不是刚刚发送的内容
+            if(messageList[messageList.Count - 1] == message)
+            {
+                WriteLog($"消息 「{message}」 发送成功。");
+            }
+            else
+            {
+                WriteLog("消息发送失败。");
+            }
+        }
+
+        private List<string> GetMessageList(Window weChatMainWindow)
+        {
+            List<string> messagese = new List<string>();
+            //查找消息列表（可见范围，不包含需要通过「点击查看更多内容」才能显示的消息
+            AutomationElement messageListElement = null;
+            Retry.WhileNull<AutomationElement>(() =>
+            {
+                messageListElement = weChatMainWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.List).And(cf.ByName("消息")));
+                return messageListElement;
+            });
+            var messageItems = messageListElement.FindAllDescendants(cf => cf.ByControlType(ControlType.ListItem));
+            foreach(var item in messageItems)
+            {
+                messagese.Add(item.Name);
+            }
+            return messagese;
         }
 
         /// <summary>
@@ -282,22 +322,6 @@ namespace WeChatAutomationDemo
         private void WriteLog(string log)
         {
             TextBox_Log.AppendText(string.Format("{0}  {1}{2}", DateTime.Now.ToString("HH:mm:ss"), log, Environment.NewLine));
-        }
-
-        /// <summary>
-        /// 获取指定窗口是否可见（存在）
-        /// </summary>
-        /// <param name="windowName">窗口名称</param>
-        /// <returns></returns>
-        private bool GetWindowVisibleStatus(string windowName)
-        {
-            var desktop = new UIA3Automation().GetDesktop();
-            if (desktop == null)
-            {
-                desktop = new UIA3Automation().GetDesktop();
-            }
-            var element = desktop.FindFirstDescendant(cf => cf.ByName(windowName));
-            return !(element == null);
         }
 
         /// <summary>

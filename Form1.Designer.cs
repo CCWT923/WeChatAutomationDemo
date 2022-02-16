@@ -50,35 +50,38 @@ namespace WeChatAutomationDemo
             // 
             // TextBox_Log
             // 
-            this.TextBox_Log.Location = new System.Drawing.Point(12, 258);
-            this.TextBox_Log.Margin = new System.Windows.Forms.Padding(2);
+            this.TextBox_Log.Location = new System.Drawing.Point(16, 322);
+            this.TextBox_Log.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TextBox_Log.Multiline = true;
             this.TextBox_Log.Name = "TextBox_Log";
             this.TextBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextBox_Log.Size = new System.Drawing.Size(571, 94);
+            this.TextBox_Log.Size = new System.Drawing.Size(760, 116);
             this.TextBox_Log.TabIndex = 2;
             // 
             // TextBox_AppPath
             // 
-            this.TextBox_AppPath.Location = new System.Drawing.Point(82, 12);
+            this.TextBox_AppPath.Location = new System.Drawing.Point(109, 15);
+            this.TextBox_AppPath.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.TextBox_AppPath.Name = "TextBox_AppPath";
-            this.TextBox_AppPath.Size = new System.Drawing.Size(384, 21);
+            this.TextBox_AppPath.Size = new System.Drawing.Size(511, 25);
             this.TextBox_AppPath.TabIndex = 3;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 15);
+            this.label1.Location = new System.Drawing.Point(12, 19);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 12);
+            this.label1.Size = new System.Drawing.Size(82, 15);
             this.label1.TabIndex = 4;
             this.label1.Text = "微信位置：";
             // 
             // Btn_FindFile
             // 
-            this.Btn_FindFile.Location = new System.Drawing.Point(486, 10);
+            this.Btn_FindFile.Location = new System.Drawing.Point(648, 12);
+            this.Btn_FindFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Btn_FindFile.Name = "Btn_FindFile";
-            this.Btn_FindFile.Size = new System.Drawing.Size(75, 23);
+            this.Btn_FindFile.Size = new System.Drawing.Size(100, 29);
             this.Btn_FindFile.TabIndex = 5;
             this.Btn_FindFile.Text = "浏览";
             this.Btn_FindFile.UseVisualStyleBackColor = true;
@@ -86,27 +89,29 @@ namespace WeChatAutomationDemo
             // 
             // TextBox_SendTarget
             // 
-            this.TextBox_SendTarget.Location = new System.Drawing.Point(79, 31);
+            this.TextBox_SendTarget.Location = new System.Drawing.Point(105, 39);
+            this.TextBox_SendTarget.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.TextBox_SendTarget.Name = "TextBox_SendTarget";
-            this.TextBox_SendTarget.Size = new System.Drawing.Size(383, 21);
+            this.TextBox_SendTarget.Size = new System.Drawing.Size(509, 25);
             this.TextBox_SendTarget.TabIndex = 6;
             this.TextBox_SendTarget.Text = "文件传输助手";
             // 
             // TextBox_Message
             // 
-            this.TextBox_Message.Location = new System.Drawing.Point(79, 68);
+            this.TextBox_Message.Location = new System.Drawing.Point(105, 85);
+            this.TextBox_Message.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.TextBox_Message.Multiline = true;
             this.TextBox_Message.Name = "TextBox_Message";
-            this.TextBox_Message.Size = new System.Drawing.Size(384, 98);
+            this.TextBox_Message.Size = new System.Drawing.Size(511, 122);
             this.TextBox_Message.TabIndex = 6;
             this.TextBox_Message.Text = "{TIME}  测试内容";
             // 
             // Button_SendMessage
             // 
-            this.Button_SendMessage.Location = new System.Drawing.Point(474, 24);
-            this.Button_SendMessage.Margin = new System.Windows.Forms.Padding(2);
+            this.Button_SendMessage.Location = new System.Drawing.Point(632, 30);
+            this.Button_SendMessage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Button_SendMessage.Name = "Button_SendMessage";
-            this.Button_SendMessage.Size = new System.Drawing.Size(97, 32);
+            this.Button_SendMessage.Size = new System.Drawing.Size(121, 40);
             this.Button_SendMessage.TabIndex = 1;
             this.Button_SendMessage.Text = "发送消息";
             this.Button_SendMessage.UseVisualStyleBackColor = true;
@@ -115,18 +120,20 @@ namespace WeChatAutomationDemo
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 34);
+            this.label5.Location = new System.Drawing.Point(11, 42);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(65, 12);
+            this.label5.Size = new System.Drawing.Size(82, 15);
             this.label5.TabIndex = 4;
             this.label5.Text = "发送目标：";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 68);
+            this.label3.Location = new System.Drawing.Point(8, 85);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 12);
+            this.label3.Size = new System.Drawing.Size(82, 15);
             this.label3.TabIndex = 4;
             this.label3.Text = "消息内容：";
             // 
@@ -139,26 +146,30 @@ namespace WeChatAutomationDemo
             this.groupBox1.Controls.Add(this.Button_SendMessage);
             this.groupBox1.Controls.Add(this.TextBox_SendTarget);
             this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Location = new System.Drawing.Point(12, 39);
+            this.groupBox1.Location = new System.Drawing.Point(16, 49);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(576, 214);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(760, 268);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             // 
             // dateTimePicker1
             // 
             this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker1.Location = new System.Drawing.Point(157, 181);
+            this.dateTimePicker1.Location = new System.Drawing.Point(209, 226);
+            this.dateTimePicker1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(172, 21);
+            this.dateTimePicker1.Size = new System.Drawing.Size(228, 25);
             this.dateTimePicker1.TabIndex = 8;
             // 
             // CheckBox_ScheduleTask
             // 
             this.CheckBox_ScheduleTask.AutoSize = true;
-            this.CheckBox_ScheduleTask.Location = new System.Drawing.Point(79, 181);
+            this.CheckBox_ScheduleTask.Location = new System.Drawing.Point(105, 226);
+            this.CheckBox_ScheduleTask.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.CheckBox_ScheduleTask.Name = "CheckBox_ScheduleTask";
-            this.CheckBox_ScheduleTask.Size = new System.Drawing.Size(72, 16);
+            this.CheckBox_ScheduleTask.Size = new System.Drawing.Size(89, 19);
             this.CheckBox_ScheduleTask.TabIndex = 7;
             this.CheckBox_ScheduleTask.Text = "定时任务";
             this.CheckBox_ScheduleTask.UseVisualStyleBackColor = true;
@@ -178,15 +189,15 @@ namespace WeChatAutomationDemo
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 360);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Btn_FindFile);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TextBox_AppPath);
             this.Controls.Add(this.TextBox_Log);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

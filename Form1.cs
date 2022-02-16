@@ -22,9 +22,8 @@ namespace WeChatAutomationDemo
             InitializeComponent();
         }
 
-        
-
         const string appDefaultPath = @"C:\Program Files (x86)\Tencent\WeChat\WeChat.exe";
+        private const string weChatCnName = "微信";
 
         /// <summary>
         /// 获取微信的主程序对象
@@ -80,57 +79,73 @@ namespace WeChatAutomationDemo
         {
             AutomationElement desktop = new UIA3Automation().GetDesktop();
             ConditionFactory cf = new ConditionFactory(new UIA3PropertyLibrary());
+            AutomationElement weChatTrayButton = null;
+            Window weChatMainWindow = null;
             /**
             * 微信，如果隐藏在托盘区域的话（非最小化状态），那么试图获取主窗口会一直卡住，直到手动点击微信
             * 图标将其窗口显示出来，程序才能正常运行。
             * 可以通过查找桌面的子元素，看看是否有微信的窗口来判断其是否隐藏在托盘区
             * 
             */
-            ShowNotifyOverflow(desktop, cf);
-
-            AutomationElement btn_WeChat_TrayButton = null;
-            AutomationElement Panel_NotifyOverFlowArea = null;
-            Retry.WhileNull(() =>
+            //首先判断是否最小化到任务栏
+            //查找一个名为「微信」的窗口
+            //weChatMainWindow = desktop.FindFirstDescendant(cf.ByName(weChatCnName).And(cf.ByClassName("WeChatMainWndForPC"))).AsWindow();
+            if (weChatMainWindow == null)
             {
-                Panel_NotifyOverFlowArea = desktop.FindFirstDescendant(cf.ByName("通知溢出")).AsWindow();
-                return Panel_NotifyOverFlowArea;
-            }, TimeSpan.FromSeconds(5), null, true, false, "没有找到「通知溢出」的按钮。");
-
-            //查找并点击托盘区域微信的图标
-            btn_WeChat_TrayButton = Panel_NotifyOverFlowArea.FindFirstDescendant(cf.ByName("微信")).AsButton();
-            //如果微信有新消息，直接点击按钮不会调出主窗口，需要点击“忽略全部”
-            var rect = btn_WeChat_TrayButton.BoundingRectangle;
-            Mouse.MoveTo(rect.X, rect.Y); //移动到微信按钮上
-            //查找是否有“忽略全部”的按钮
-            var ignoreButton = desktop.FindFirstDescendant(cf.ByName("微信")).AsWindow().FindFirstDescendant(cf.ByName("忽略全部")).AsButton();
-            //ignoreButton.DrawHighlight();
-            if(ignoreButton != null)
-            {
-                WriteLog("忽略新消息");
-                rect = ignoreButton.BoundingRectangle;
-                //这里不能直接点击按钮
-                Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
-            }
-            Mouse.Click();
-            Thread.Sleep(300);
-
-            Window appMainWindow = app.GetMainWindow(new UIA3Automation());
-            if(appMainWindow != null)
-            {
-                return appMainWindow;
+                //查找是否隐藏到托盘区（未隐藏到「通知 V 形」）
+                //Shell_TrayWnd：任务栏
+                //TrayNotifyWnd：托盘区域通知
+                weChatTrayButton = desktop.FindFirstDescendant(cf.ByClassName("Shell_TrayWnd")).FindFirstDescendant(cf.ByClassName("TrayNotifyWnd")).FindFirstDescendant(cf.ByName(weChatCnName)).AsButton();
             }
             else
             {
+                return weChatMainWindow;
+            }
+            if (weChatTrayButton == null)
+            {
+                //在「通知V形」中查找微信
+                WriteLog($"没有在通知区域找到{weChatCnName}，继续查找下一个位置。");
                 ShowNotifyOverflow(desktop, cf);
+                AutomationElement Panel_NotifyOverFlowArea = null;
                 Retry.WhileNull(() =>
                 {
                     Panel_NotifyOverFlowArea = desktop.FindFirstDescendant(cf.ByName("通知溢出")).AsWindow();
                     return Panel_NotifyOverFlowArea;
-                }, TimeSpan.FromSeconds(5), null, true, false, "没有找到「通知溢出」的按钮。");
-                //查找并点击托盘区域微信的图标
-                btn_WeChat_TrayButton = Panel_NotifyOverFlowArea.FindFirstDescendant(cf.ByName("微信")).AsButton();
-                btn_WeChat_TrayButton.Click();
-                return app.GetMainWindow(new UIA3Automation());
+                }, TimeSpan.FromSeconds(5), null,false, false, "没有找到「通知溢出」的按钮。");
+                weChatTrayButton = Panel_NotifyOverFlowArea.FindFirstDescendant(cf.ByName(weChatCnName)).AsButton();
+            }
+            if(weChatTrayButton == null)
+            {
+                WriteLog($"在三个可能的位置都没有找到{weChatCnName}，请确认微信是否在运行。");
+                return null;
+            }
+            var point = weChatTrayButton.GetClickablePoint();
+            Mouse.Click(point);
+            //如果微信有新消息，直接点击按钮不会调出主窗口，需要点击消息
+            //var rect = weChatTrayButton.BoundingRectangle;
+            //Mouse.MoveTo(rect.X, rect.Y); //移动到微信按钮上
+            var listItem = desktop.FindFirstDescendant(cf.ByName(weChatCnName)).AsWindow().FindFirstDescendant(cf.ByControlType(ControlType.ListItem)).AsWindow();
+
+            if(listItem != null)
+            {
+                WriteLog("有新消息");
+                point = listItem.GetClickablePoint();
+                Mouse.Click(point);
+            }
+            else
+            {
+                Mouse.Click();
+                Thread.Sleep(300);
+            }
+
+            weChatMainWindow = app.GetMainWindow(new UIA3Automation());
+            if(weChatMainWindow != null)
+            {
+                return weChatMainWindow;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -151,8 +166,8 @@ namespace WeChatAutomationDemo
                 return null;
             }
             var rect = Btn_Chat.BoundingRectangle;
-            Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
-            Thread.Sleep(500);
+            ClickRectangleEnter(rect);
+            //Thread.Sleep(500);
 
             var edit_SearchChatObject = GetWeChatControl(in wechatWindow,"搜索", ControlType.Edit);
             if (edit_SearchChatObject == null)
@@ -160,12 +175,38 @@ namespace WeChatAutomationDemo
                 WriteLog("没有找到指定的控件：搜索框。");
                 return null;
             }
-            WriteLog("搜索指定内容：" + target);
+            WriteLog("搜索发送对象：" + target);
             rect = edit_SearchChatObject.BoundingRectangle;
-            Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
+            ClickRectangleEnter(rect);
             edit_SearchChatObject.AsTextBox().Enter(target);
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             Keyboard.Press(VirtualKeyShort.ENTER);
+
+            //搜索结果是包含在一个 List 控件中的
+            var searchResult = wechatWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.List).And(cf.ByName("搜索结果")));
+            AutomationElement conditionControl;
+            Thread.Sleep(500);
+            if(searchResult != null)
+            {
+                //查找 List 控件是否有「联系人」的 「Text」控件
+                conditionControl = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.Text).And(cf.ByName("联系人")));
+            }
+            else
+            {
+                return null;
+            }
+            
+            if(conditionControl != null)
+            {
+                var item = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.ListItem));
+                rect = item.BoundingRectangle;
+                ClickRectangleEnter(rect);
+            }
+            else
+            {
+                WriteLog($"没有找到指定的联系人：{target}");
+                return null;
+            }
 
             //查找发送消息的文本框
             var edit_MessageInput = GetWeChatControl(in wechatWindow, "输入", ControlType.Edit);
@@ -177,11 +218,19 @@ namespace WeChatAutomationDemo
             return edit_MessageInput;
         }
 
-        private void SendMessage(in Window wechatWindow, in AutomationElement chatInputBux, string message)
+        private void ClickRectangleEnter(in Rectangle rect)
         {
-            var rect = chatInputBux.BoundingRectangle;
-            Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
-            Thread.Sleep(500);
+            Mouse.Click(new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2));
+        }
+
+        private void SendMessage(in Window wechatWindow, in AutomationElement chatInputBox, string message)
+        {
+            //var rect = chatInputBux.BoundingRectangle;
+            //Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
+            //Thread.Sleep(500);
+            //点击「聊天」按钮
+            var rect = chatInputBox.BoundingRectangle;
+            ClickRectangleEnter(rect);
 
             //查找「发送」按钮，并单击发送消息
             var btn_SendMessage = GetWeChatControl(wechatWindow,"发送(S)", ControlType.Button);
@@ -201,9 +250,8 @@ namespace WeChatAutomationDemo
             Keyboard.Pressing(VirtualKeyShort.CONTROL);
             Keyboard.Press(VirtualKeyShort.KEY_V);
             Keyboard.Release(VirtualKeyShort.CONTROL);
-            Mouse.Click(new Point(rect.X + (rect.Width / 2), rect.Y + (rect.Height / 2)));
-            WriteLog("发送成功。");
-            Thread.Sleep(500);
+            ClickRectangleEnter(rect);
+            WriteLog($"消息 「{message}」 发送成功。");
         }
 
         private int GetProcessId(string processName)
@@ -305,12 +353,13 @@ namespace WeChatAutomationDemo
                 return;
             }
             var wechatMainWindow = GetWeChatMainWindow(ref app);
-            wechatMainWindow.Focus();
             if (wechatMainWindow == null)
             {
                 WriteLog("没有获取到微信的主窗口");
                 return;
             }
+            wechatMainWindow.Focus();
+            //搜索发送目标
             var chatBox = SearchTarget(wechatMainWindow, TextBox_SendTarget.Text);
             if (chatBox == null)
             {

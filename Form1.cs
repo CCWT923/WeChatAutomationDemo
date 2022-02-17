@@ -195,11 +195,16 @@ namespace WeChatAutomationDemo
                 return null;
             }
 
-            AutomationElement conditionControl;
+            AutomationElement contactControl = null;
             if(searchResult != null)
             {
-                //查找 List 控件是否有「联系人」的 「Text」控件
-                conditionControl = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.Text).And(cf.ByName("联系人")));
+                Retry.WhileNull(() =>
+                {
+                    //查找 List 控件是否有「联系人」的 「Text」控件
+                    contactControl = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.Text).And(cf.ByName("联系人")));
+                    return contactControl;
+                },TimeSpan.FromSeconds(3),null,false,false,"没有找到联系人的控件，可能没有指定的联系人。");
+                
             }
             else
             {
@@ -207,11 +212,20 @@ namespace WeChatAutomationDemo
                 return null;
             }
             
-            if(conditionControl != null)
+            if(contactControl != null)
             {
-                var item = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.ListItem));
-                rect = item.BoundingRectangle;
-                ClickRectangleEnter(rect);
+                //查找到的联系人结果
+                AutomationElement item = null;
+                Retry.WhileNull(() =>
+                {
+                    item = searchResult.FindFirstDescendant(cf => cf.ByControlType(ControlType.ListItem));
+                    return item;
+                }, TimeSpan.FromMilliseconds(5), null, false, false, "没有获取到已查找到结果的联系人控件。");
+                if(item != null)
+                {
+                    rect = item.BoundingRectangle;
+                    ClickRectangleEnter(rect);
+                }
             }
             else
             {

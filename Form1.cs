@@ -406,12 +406,17 @@ namespace WeChatAutomationDemo
                 return;
             }
             SendMessage(wechatMainWindow, chatBox, TextBox_Message.Text);
-            //wechatMainWindow.Close();
+            wechatMainWindow.Close();
         }
 
         private void Button_SendMessage_Click(object sender, EventArgs e)
         {
-            if(timer1.Enabled)
+            if (TextBox_Message.Text == "")
+            {
+                WriteLog("发送的文本不能为空。");
+                return;
+            }
+            if (timer1.Enabled)
             {
                 timer1.Enabled = false;
                 WriteLog("停止计划任务。");
